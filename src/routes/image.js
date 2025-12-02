@@ -9,45 +9,67 @@ imageRouter.get("/image-proxy", async (req, res) => {
         const imageUrl = req.query.url;
 
         if (!imageUrl) {
+            console.log("Image Proxy: Missing URL");
             return res.status(400).send("Missing url parameter");
         }
 
-        // Decode the URL if it's encoded
         const decodedUrl = decodeURIComponent(imageUrl);
+        console.log("Image Proxy: Fetching", decodedUrl);
 
-        // Choose http or https based on the URL
+        // Validate platform-specific URLs if needed
+        // Instagram/Facebook CDN URLs often start with scontent or external domains
+
         const client = decodedUrl.startsWith("https") ? https : http;
 
-        // Fetch the image
-        client.get(decodedUrl, {
+        const options = {
             headers: {
-                // Mimic a browser request
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                "Accept": "image/webp,image/apng,image/*,*/*;q=0.8",
-                "Referer": new URL(decodedUrl).origin,
+                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Cache-Control": "no-cache",
+                "Pragma": "no-cache"
             }
-        }, (imageRes) => {
-            // Check if it's a valid image response
+        };
+
+        const proxyReq = client.get(decodedUrl, options, (imageRes) => {
+            console.log(`Image Proxy: Status ${imageRes.statusCode} for URL: ${decodedUrl.substring(0, 50)}...`);
+
+            if (imageRes.statusCode >= 400) {
+                console.error(`Image Proxy: Request failed with status ${imageRes.statusCode}`);
+                // If it's a 4xx/5xx from the source, we might want to still try to serve it or fail
+                return res.status(imageRes.statusCode).send("Failed to fetch image from source");
+            }
+
+            // Copy over important headers
             const contentType = imageRes.headers["content-type"];
+            if (contentType) res.setHeader("Content-Type", contentType);
 
-            if (imageRes.statusCode !== 200) {
-                return res.status(imageRes.statusCode).send("Failed to fetch image");
-            }
+            // Cache for 1 day
+            res.setHeader("Cache-Control", "public, max-age=86400");
 
-            // Set appropriate headers
-            res.setHeader("Content-Type", contentType || "image/jpeg");
-            res.setHeader("Cache-Control", "public, max-age=86400"); // Cache for 1 day
-
-            // Pipe the image data to the response
             imageRes.pipe(res);
-        }).on("error", (err) => {
-            console.error("Image proxy error:", err.message);
-            res.status(500).send("Failed to fetch image");
+        });
+
+        proxyReq.on("error", (err) => {
+            console.error("Image Proxy: Connection error:", err.message);
+            if (!res.headersSent) {
+                res.status(500).send("Proxy error: " + err.message);
+            }
+        });
+
+        proxyReq.setTimeout(15000, () => {
+            console.error("Image Proxy: Request timed out");
+            proxyReq.destroy();
+            if (!res.headersSent) {
+                res.status(504).send("Image fetch timed out");
+            }
         });
 
     } catch (err) {
-        console.error("Image proxy error:", err.message);
-        res.status(500).send("ERROR: " + err.message);
+        console.error("Image Proxy: Server error", err.message);
+        if (!res.headersSent) {
+            res.status(500).send("ERROR: " + err.message);
+        }
     }
 });
 
