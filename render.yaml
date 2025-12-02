@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: stackmates-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 20.10.0
+      - key: PORT
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: DB_CONNECTION_SECRET
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY
+        sync: false
+      - key: AWS_SECRET_KEY
+        sync: false
+      - key: SENDER_EMAIL
+        sync: false
+      - key: RAZORPAY_KEY_ID
+        sync: false
+      - key: RAZORPAY_KEY_SECRET
+        sync: false
+      - key: RAZORPAY_WEBHOOK_SECRET
+        sync: false
+      - key: DEFAULT_PROFILE_PHOTO
+        sync: false
+      - key: DEFAULT_USER_ABOUT
+        sync: false
