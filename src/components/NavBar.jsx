@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, getProxiedImageUrl, DEFAULT_PROFILE_IMAGE } from "../utils/constants";
 import { removeUser } from "../utils/userSlice";
 
 const NavBar = () => {
@@ -37,7 +37,13 @@ const NavBar = () => {
               className="btn btn-ghost btn-circle avatar"
             >
               <div className="w-10 rounded-full">
-                <img alt="user photo" src={user.photoUrl} />
+                <img
+                  alt="user photo"
+                  src={getProxiedImageUrl(user.photoUrl)}
+                  onError={(e) => {
+                    e.target.src = DEFAULT_PROFILE_IMAGE;
+                  }}
+                />
               </div>
             </div>
             <ul

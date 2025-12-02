@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, getProxiedImageUrl, DEFAULT_PROFILE_IMAGE } from "../utils/constants";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { addConnections } from "../utils/conectionSlice";
@@ -45,7 +45,10 @@ const Connections = () => {
               <img
                 alt="photo"
                 className="w-20 h-20 rounded-full object-cover"
-                src={photoUrl}
+                src={getProxiedImageUrl(photoUrl)}
+                onError={(e) => {
+                  e.target.src = DEFAULT_PROFILE_IMAGE;
+                }}
               />
             </div>
             <div className="text-left mx-4 ">

@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, getProxiedImageUrl, DEFAULT_PROFILE_IMAGE } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUserFromFeed } from "../utils/feedSlice";
 
@@ -15,13 +15,19 @@ const UserCard = ({ user }) => {
         { withCredentials: true }
       );
       dispatch(removeUserFromFeed(userId));
-    } catch (err) {}
+    } catch (err) { }
   };
 
   return (
     <div className="card bg-base-300 w-96 shadow-xl">
       <figure>
-        <img src={user.photoUrl} alt="photo" />
+        <img
+          src={getProxiedImageUrl(user.photoUrl)}
+          alt="photo"
+          onError={(e) => {
+            e.target.src = DEFAULT_PROFILE_IMAGE;
+          }}
+        />
       </figure>
       <div className="card-body">
         <h2 className="card-title">{firstName + " " + lastName}</h2>
