@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 export const APP_NAME = import.meta.env.VITE_APP_NAME || "StackMates";
 export const APP_DESCRIPTION = import.meta.env.VITE_APP_DESCRIPTION || "Connect to other developers";
@@ -25,3 +26,11 @@ export const getProxiedImageUrl = (imageUrl) => {
   // Proxy external URLs through our backend
   return `${BASE_URL}/image-proxy?url=${encodeURIComponent(imageUrl)}`;
 };
+=======
+const membershipAmount = {
+  silver: 300,
+  gold: 700,
+};
+
+module.exports = { membershipAmount };
+>>>>>>> 9e702e9ee473a59891dad8c6e0231306a1b7e407
