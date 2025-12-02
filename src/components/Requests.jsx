@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, getProxiedImageUrl, DEFAULT_PROFILE_IMAGE } from "../utils/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { addRequests, removeRequest } from "../utils/requestSlice";
 import { useEffect, useState } from "react";
@@ -16,7 +16,7 @@ const Requests = () => {
         { withCredentials: true }
       );
       dispatch(removeRequest(_id));
-    } catch (err) {}
+    } catch (err) { }
   };
 
   const fetchRequests = async () => {
@@ -26,7 +26,7 @@ const Requests = () => {
       });
 
       dispatch(addRequests(res.data.data));
-    } catch (err) {}
+    } catch (err) { }
   };
 
   useEffect(() => {
@@ -55,7 +55,10 @@ const Requests = () => {
               <img
                 alt="photo"
                 className="w-20 h-20 rounded-full"
-                src={photoUrl}
+                src={getProxiedImageUrl(photoUrl)}
+                onError={(e) => {
+                  e.target.src = DEFAULT_PROFILE_IMAGE;
+                }}
               />
             </div>
             <div className="text-left mx-4 ">
