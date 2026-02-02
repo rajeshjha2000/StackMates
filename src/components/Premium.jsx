@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BASE_URL } from "../utils/constants";
+import { BASE_URL, APP_NAME, APP_DESCRIPTION, RAZORPAY_THEME_COLOR } from "../utils/constants";
 import { useEffect, useState } from "react";
 
 const Premium = () => {
@@ -33,8 +33,8 @@ const Premium = () => {
       key: keyId,
       amount,
       currency,
-      name: "Dev Tinder",
-      description: "Connect to other developers",
+      name: APP_NAME,
+      description: APP_DESCRIPTION,
       order_id: orderId,
       prefill: {
         name: notes.firstName + " " + notes.lastName,
@@ -42,7 +42,7 @@ const Premium = () => {
         contact: "9999999999",
       },
       theme: {
-        color: "#F37254",
+        color: RAZORPAY_THEME_COLOR,
       },
       handler: verifyPremiumUser,
     };
