@@ -9,9 +9,14 @@ require("dotenv").config();
 
 require("./utils/cronjob");
 
+const allowedOrigins = (process.env.CORS_ORIGIN || "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true,
   })
 );
@@ -39,8 +44,9 @@ initializeSocket(server);
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-    server.listen(process.env.PORT, () => {
-      console.log("Server is successfully listening on port 7777...");
+    const port = process.env.PORT || 7777;
+    server.listen(port, () => {
+      console.log(`Server is successfully listening on port ${port}...`);
     });
   })
   .catch((err) => {
